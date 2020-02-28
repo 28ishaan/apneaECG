@@ -158,6 +158,55 @@ def build_baseline_model():
     model.summary()
     return model
 
+'''def transform_model():
+    model1 = Sequential()
+    layers = {'input': 1, 'hidden1': 28, 'hidden2': 128, 'hidden3': 128, 'hidden4': 10, 'output': 1}
+    model1.add(LSTM(layers['hidden1'],
+                   input_shape= (sequence_length, layers['input']),
+                    #recurrent_dropout=0.5,
+                   return_sequences=True))
+
+    model1.add(LSTM(
+            layers['hidden2'],
+            #recurrent_dropout=0.5,
+            return_sequences=True))
+
+    model1.add(LSTM(
+            layers['hidden3'],
+            recurrent_dropout=0.2,
+            return_sequences=False))
+
+    model1.add(LSTM(
+        	layers['hidden4'],
+            #recurrent_dropout=0.5,
+            return_sequences=False))
+
+    model1.summary()
+
+    model2 = Sequential()
+    model2.add(Dense(28, input_dim=2))
+
+    model2.summary()
+
+    merged = Merge([model1, model2], mode='concat')
+
+    model = Sequential()
+
+    model.add(merged)
+    model.add(Dense(8))
+    model.add(Dense(
+        output_dim=layers['output'],
+        kernel_initializer='normal'))
+    model.add(Activation("relu"))
+
+    start = time.time()
+    model.compile(loss="sparse_categorical_crossentropy", optimizer="adam",
+                  metrics = ['accuracy'])
+    print ("Compilation Time : ", time.time() - start)
+
+    model.summary()
+    return model'''
+
 
 def run_network(model=None, data=None):
     global_start_time = time.time()
@@ -173,8 +222,8 @@ def run_network(model=None, data=None):
     print (class_w)
 
     if model is None:
-        #model = build_model()
-        model = build_baseline_model()
+        model = build_model()
+        #model = build_baseline_model()
 
     try:
         print("Training")
