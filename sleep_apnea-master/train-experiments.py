@@ -222,8 +222,8 @@ def run_network(model=None, data=None):
     print (class_w)
 
     if model is None:
-        model = build_model()
-        #model = build_baseline_model()
+        #model = build_model()
+        model = build_baseline_model()
 
     try:
         print("Training")
