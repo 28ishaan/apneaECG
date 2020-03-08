@@ -65,23 +65,29 @@ def get_data():
 
 
 
-def build_model():
+def build_baseline_model():
     model1 = Sequential()
+    #layers = {'input': 1, 'hidden1': 28, 'hidden2': 128, 'hidden3': 128, 'hidden4': 10, 'output': 1}
     layers = {'input': 2, 'hidden1': 256, 'hidden2': 256, 'hidden3': 256, 'output': 1}
     model1.add(LSTM(layers['hidden1'],
                    input_shape= (sequence_length, layers['input']),
-                    recurrent_dropout=0.5,
+                   recurrent_dropout=0.5,
                    return_sequences=True))
 
     model1.add(LSTM(
             layers['hidden2'],
-            recurrent_dropout=0.5,
+            recurrent_dropout=0.2,
             return_sequences=True))
 
     model1.add(LSTM(
             layers['hidden3'],
-            recurrent_dropout=0.5,
+            recurrent_dropout=0.2,
             return_sequences=False))
+
+    #model1.add(LSTM(
+    #    	layers['hidden4'],
+    #        #recurrent_dropout=0.2,
+    #        return_sequences=False))
 
     model1.summary()
 
@@ -99,7 +105,7 @@ def build_model():
     model.add(Dense(
         output_dim=layers['output'],
         kernel_initializer='normal'))
-    model.add(Activation("sigmoid"))
+    model.add(Activation("relu"))
 
     start = time.time()
     model.compile(loss="binary_crossentropy", optimizer="adam",
@@ -111,31 +117,32 @@ def build_model():
 
 def build_baseline_model():
     model1 = Sequential()
-    layers = {'input': 1, 'hidden1': 28, 'hidden2': 128, 'hidden3': 128, 'hidden4': 10, 'output': 1}
+    #layers = {'input': 1, 'hidden1': 28, 'hidden2': 128, 'hidden3': 128, 'hidden4': 10, 'output': 1}
+    layers = {'input': 2, 'hidden1': 256, 'hidden2': 256, 'hidden3': 256, 'output': 1}
     model1.add(LSTM(layers['hidden1'],
                    input_shape= (sequence_length, layers['input']),
-                    #recurrent_dropout=0.5,
+                   recurrent_dropout=0.5,
                    return_sequences=True))
 
     model1.add(LSTM(
             layers['hidden2'],
-            #recurrent_dropout=0.5,
+            recurrent_dropout=0.5,
             return_sequences=True))
 
     model1.add(LSTM(
             layers['hidden3'],
-            recurrent_dropout=0.2,
+            recurrent_dropout=0.5,
             return_sequences=False))
 
-    model1.add(LSTM(
-        	layers['hidden4'],
-            #recurrent_dropout=0.5,
-            return_sequences=False))
+    #model1.add(LSTM(
+    #    	layers['hidden4'],
+    #        #recurrent_dropout=0.2,
+    #        return_sequences=False))
 
     model1.summary()
 
     model2 = Sequential()
-    model2.add(Dense(28, input_dim=2))
+    model2.add(Dense(32, input_dim=2))
 
     model2.summary()
 
@@ -151,7 +158,7 @@ def build_baseline_model():
     model.add(Activation("relu"))
 
     start = time.time()
-    model.compile(loss="sparse_categorical_crossentropy", optimizer="adam",
+    model.compile(loss="binary_crossentropy", optimizer="adam",
                   metrics = ['accuracy'])
     print ("Compilation Time : ", time.time() - start)
 
@@ -207,6 +214,76 @@ def build_baseline_model():
     model.summary()
     return model'''
 
+def convolutional():
+    model1 = Sequential()
+    layers = {'input': 1, 'hidden1': 28, 'hidden2': 128, 'hidden3': 128, 'hidden4': 10, 'output': 1}
+
+    model1.add(Conv2D(
+            layers['hidden1'],
+            input_shape= (sequence_length, layers['input']),
+            filter_size = 4
+            kernel_size = 4
+            strides = 7
+            #recurrent_dropout=0.5,
+            return_sequences=True))
+
+    model1.add(Conv2D(
+            layers['hidden2'],
+            filter_size = 4
+            kernel_size = 4
+            strides = 7
+            #recurrent_dropout=0.5,
+            return_sequences=True))
+
+    model1.add(Conv2D(
+            layers['hidden3'],
+            filter_size = 4
+            kernel_size = 2
+            strides = 4
+            recurrent_dropout=0.2,
+            return_sequences=False))
+
+    keras.layers.Conv2D(
+        filter_size = 2,
+        kernel_size = 2,
+        strides=(1, 1),
+        data_format=None,
+        dilation_rate=(1, 1),
+        activation=None,
+        use_bias=True,
+        kernel_initializer='glorot_uniform',
+        bias_initializer='zeros',
+        kernel_regularizer=None,
+        bias_regularizer=None,
+        activity_regularizer=None,
+        kernel_constraint=None,
+        bias_constraint=None)
+
+    model1.summary()
+
+    model2 = Sequential()
+    model2.add(Dense(28, input_dim=2))
+
+    model2.summary()
+
+    merged = Merge([model1, model2], mode='concat')
+
+    model = Sequential()
+
+    model.add(merged)
+    model.add(Dense(8))
+    model.add(Dense(
+        output_dim=layers['output'],
+        kernel_initializer='normal'))
+    model.add(Activation("relu"))
+
+    start = time.time()
+    model.compile(loss="sparse_categorical_crossentropy", optimizer="adam",
+                  metrics = ['accuracy'])
+    print ("Compilation Time : ", time.time() - start)
+
+    model.summary()
+    return model
 
 def run_network(model=None, data=None):
     global_start_time = time.time()
@@ -223,7 +300,8 @@ def run_network(model=None, data=None):
 
     if model is None:
         #model = build_model()
-        model = build_baseline_model()
+        #model = build_baseline_model()
+        model = convolutional()
 
     try:
         print("Training")
